@@ -1,0 +1,71 @@
+math_operations.cpp
+Request:
+// Copilot: Implement the add(int a, int b) function that returns sum of two ints.
+#include "math_operations.h"
+
+Respond:
+int add(int a, int b) {
+    return a + b;
+}
+
+math_operations.h
+Request:
+// Copilot: Create a header file that declares a function int add(int a, int b);
+
+Respond:
+#ifndef CSAD2526KI405BASYSTIUKMARIANA1_MATH_OPERATIONS_H
+#define CSAD2526KI405BASYSTIUKMARIANA1_MATH_OPERATIONS_H
+int add(int a, int b);
+#endif //CSAD2526KI405BASYSTIUKMARIANA1_MATH_OPERATIONS_H
+
+unit_tests.cpp
+Request:
+// Copilot: Create GoogleTest unit tests for add(int a, int b) with at least one test named BasicAddition.
+Respond:
+#include <gtest/gtest.h>
+#include "../math_operations.h"
+
+// Test suite for the add function
+TEST(AdditionTests, BasicAddition) {
+EXPECT_EQ(add(2, 3), 5);
+EXPECT_EQ(add(-1, 1), 0);
+EXPECT_EQ(add(0, 0), 0);
+EXPECT_EQ(add(-5, -3), -8);
+}
+
+CMakeLists.txt
+Request:
+# Copilot: Add GoogleTest integration (use FetchContent or find_package) to build tests, create test executable and enable ctest.
+Respond:
+cmake_minimum_required(VERSION 3.23)
+project(csad2526ki405basystiukmariana1)
+
+set(CMAKE_CXX_STANDARD 14)
+
+# Основний виконуваний файл
+add_executable(csad2526ki405basystiukmariana1
+        main.cpp
+        math_operations.cpp)
+
+# Підключення Google Test
+include(FetchContent)
+FetchContent_Declare(
+        googletest
+        URL https://github.com/google/googletest/archive/refs/heads/main.zip
+)
+# Забезпечуємо збірку Google Test
+FetchContent_MakeAvailable(googletest)
+
+enable_testing()  # Вмикаємо підтримку тестів
+
+# Створюємо виконуваний файл для тестів
+add_executable(unit_tests
+        tests/unit_tests.cpp
+        math_operations.cpp)
+
+# Лінкуємо тестовий виконуваний файл з бібліотекою gtest
+target_link_libraries(unit_tests gtest gtest_main)
+
+# Реєструємо тести
+add_test(NAME BasicAdditionTest COMMAND unit_tests)
+
