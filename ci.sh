@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Create build directory if it doesn't exist
+if [ ! -d "build" ]; then
+    mkdir build
+fi
+
+# Navigate to the build directory
+cd build || exit 1
+
+# Run CMake configuration
+cmake .. || exit 1
+
+# Build the project
+cmake --build . || exit 1
+
+# Run tests
+ctest || exit 1
+
+
+# Copilot: Create a bash script to create build dir, run cmake .., cmake --build ., and run ctest. Script must run without args.
