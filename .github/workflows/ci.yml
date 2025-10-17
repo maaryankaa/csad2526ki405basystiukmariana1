@@ -1,0 +1,32 @@
+#Copilot: Generate a GitHub Actions workflow that builds the CMake project on ubuntu-latest, windows-latest and macos-latest using matrix. The workflow should checkout code, setup CMake, run the ci.sh script, and run tests. Trigger on push and pull_request targeting branches with develop or master in name.
+  name: CMake Build and Test
+
+  on:
+    push:
+      branches:
+        - '*develop*'
+        - '*master*'
+    pull_request:
+      branches:
+        - '*develop*'
+        - '*master*'
+
+  jobs:
+    build-and-test:
+      name: Build and Test on ${{ matrix.os }}
+      runs-on: ${{ matrix.os }}
+
+      strategy:
+        matrix:
+          os: [ubuntu-latest, windows-latest, macos-latest]
+
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v3
+
+        - name: Set up CMake
+          uses: jwlawson/actions-setup-cmake@v1
+
+        - name: Run build and tests
+          run: ./ci.sh
+          shell: bash
