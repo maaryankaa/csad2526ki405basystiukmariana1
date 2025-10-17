@@ -30,3 +30,6 @@
         - name: Run build and tests
           run: ./ci.sh
           shell: bash
+          env:
+            CONFIG: Debug
+
