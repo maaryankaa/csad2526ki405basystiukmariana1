@@ -1,0 +1,17 @@
+# UART Top-Level Pin Assignments for EP4CE10F17C8
+
+# Clock
+set_location_assignment PIN_50 -to clk
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to clk
+
+# Reset (active low)
+set_location_assignment PIN_51 -to reset_n
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to reset_n
+
+# UART TX (з плати на зовнішній UART адаптер)
+set_location_assignment PIN_52 -to txd_out
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to txd_out
+
+# UART RX (з зовнішнього адаптера на плату)
+set_location_assignment PIN_53 -to rxd_in
+set_instance_assignment -name IO_STANDARD "3.3-V LVTTL" -to rxd_in

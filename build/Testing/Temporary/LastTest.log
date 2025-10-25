@@ -1,0 +1,29 @@
+Start testing: Oct 13 23:17 EEST
+----------------------------------------------------------
+1/1 Testing: BasicAdditionTest
+1/1 Test: BasicAdditionTest
+Command: "/Users/mac/csad2526ki405basystiukmariana1/build/unit_tests"
+Directory: /Users/mac/csad2526ki405basystiukmariana1/build
+"BasicAdditionTest" start time: Oct 13 23:17 EEST
+Output:
+----------------------------------------------------------
+Running main() from /Users/mac/csad2526ki405basystiukmariana1/build/_deps/googletest-src/googletest/src/gtest_main.cc
+[==========] Running 1 test from 1 test suite.
+[----------] Global test environment set-up.
+[----------] 1 test from AdditionTests
+[ RUN      ] AdditionTests.BasicAddition
+[       OK ] AdditionTests.BasicAddition (0 ms)
+[----------] 1 test from AdditionTests (0 ms total)
+
+[----------] Global test environment tear-down
+[==========] 1 test from 1 test suite ran. (0 ms total)
+[  PASSED  ] 1 test.
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"BasicAdditionTest" end time: Oct 13 23:17 EEST
+"BasicAdditionTest" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Oct 13 23:17 EEST

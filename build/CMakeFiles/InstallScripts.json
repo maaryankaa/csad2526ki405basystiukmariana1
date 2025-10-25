@@ -1,0 +1,10 @@
+{
+	"InstallScripts" : 
+	[
+		"/Users/mac/csad2526ki405basystiukmariana1/build/cmake_install.cmake",
+		"/Users/mac/csad2526ki405basystiukmariana1/build/_deps/googletest-build/cmake_install.cmake",
+		"/Users/mac/csad2526ki405basystiukmariana1/build/_deps/googletest-build/googlemock/cmake_install.cmake",
+		"/Users/mac/csad2526ki405basystiukmariana1/build/_deps/googletest-build/googletest/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

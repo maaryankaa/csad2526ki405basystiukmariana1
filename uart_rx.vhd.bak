@@ -1,0 +1,74 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
+
+entity uart_rx is
+    port (
+        clk        : in  std_logic;
+        reset_n    : in  std_logic;
+        baud_tick  : in  std_logic;
+        rxd_in     : in  std_logic;
+        rx_data    : out std_logic_vector(7 downto 0);
+        rx_ready   : out std_logic
+    );
+end uart_rx;
+
+architecture Behavioral of uart_rx is
+    type state_type is (IDLE, START, DATA, STOP);
+    signal state     : state_type := IDLE;
+    signal bit_index : integer range 0 to 7 := 0;
+    signal sample_cnt: integer range 0 to 15 := 0;
+    signal shift_reg : std_logic_vector(7 downto 0) := (others => '0');
+    signal ready_reg : std_logic := '0';
+begin
+    process(clk, reset_n)
+    begin
+        if reset_n = '0' then
+            state     <= IDLE;
+            ready_reg <= '0';
+        elsif rising_edge(clk) then
+            if baud_tick = '1' then
+                case state is
+                    when IDLE =>
+                        ready_reg <= '0';
+                        if rxd_in = '0' then  -- старт-біт
+                            state <= START;
+                            sample_cnt <= 0;
+                        end if;
+
+                    when START =>
+                        if sample_cnt = 7 then
+                            state <= DATA;
+                            bit_index <= 0;
+                        else
+                            sample_cnt <= sample_cnt + 1;
+                        end if;
+
+                    when DATA =>
+                        if sample_cnt = 15 then
+                            shift_reg <= rxd_in & shift_reg(7 downto 1);
+                            if bit_index = 7 then
+                                state <= STOP;
+                            else
+                                bit_index <= bit_index + 1;
+                            end if;
+                            sample_cnt <= 0;
+                        else
+                            sample_cnt <= sample_cnt + 1;
+                        end if;
+
+                    when STOP =>
+                        if sample_cnt = 15 then
+                            ready_reg <= '1';
+                            state <= IDLE;
+                        else
+                            sample_cnt <= sample_cnt + 1;
+                        end if;
+                end case;
+            end if;
+        end if;
+    end process;
+
+    rx_data  <= shift_reg;
+    rx_ready <= ready_reg;
+end Behavioral;

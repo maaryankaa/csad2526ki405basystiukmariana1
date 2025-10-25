@@ -1,0 +1,58 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.NUMERIC_STD.ALL;
+
+entity tb_uart is
+end tb_uart;
+
+architecture sim of tb_uart is
+    signal clk      : std_logic := '0';
+    signal reset_n  : std_logic := '0';
+    signal tx_start : std_logic := '0';
+    signal tx_data  : std_logic_vector(7 downto 0) := (others => '0');
+    signal txd_out  : std_logic;
+    signal rxd_in   : std_logic;
+    signal rx_data  : std_logic_vector(7 downto 0);
+    signal rx_ready : std_logic;
+
+    constant CLK_PERIOD : time := 20 ns; -- 50 MHz
+begin
+    uut : entity work.uart_top
+        port map (
+            clk      => clk,
+            reset_n  => reset_n,
+            tx_start => tx_start,
+            tx_data  => tx_data,
+            txd_out  => txd_out,
+            rxd_in   => rxd_in,
+            rx_data  => rx_data,
+            rx_ready => rx_ready
+        );
+
+    -- імітація лінії зв’язку (TX → RX)
+    rxd_in <= txd_out;
+
+    -- генерація тактового сигналу
+    clk <= not clk after CLK_PERIOD/2;
+
+    -- тестовий процес
+    process
+    begin
+        reset_n <= '0';
+        wait for 100 ns;
+        reset_n <= '1';
+        wait for 100 ns;
+
+        tx_data <= "01010101"; -- тестовий байт (0x55)
+        tx_start <= '1';
+        wait for CLK_PERIOD;
+        tx_start <= '0';
+
+        wait for 10 ms; -- достатньо для завершення передачі
+
+        assert rx_data = "01010101"
+        report "UART loopback failed!" severity error;
+
+        wait;
+    end process;
+end sim;
