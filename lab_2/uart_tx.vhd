@@ -1,8 +1,5 @@
 -- uart_tx.vhd
--- Передавач UART, 8 біт даних, без парності, 1 стоп-біт (8N1)
--- Вхід: clk, reset_n, tx_start, tx_data
--- Вихід: txd_out, tx_busy
-
+-- Передавач UART, 8N1
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
@@ -22,54 +19,84 @@ end uart_tx;
 architecture Behavioral of uart_tx is
     type state_type is (IDLE, START_BIT, DATA_BITS, STOP_BIT);
     signal state     : state_type := IDLE;
+    signal data_reg  : std_logic_vector(7 downto 0) := (others=>'0');
     signal bit_cnt   : integer range 0 to 7 := 0;
-    signal shift_reg : std_logic_vector(7 downto 0) := (others=>'0');
-    signal tx_reg    : std_logic := '1';
+    signal tick_cnt  : integer range 0 to 15 := 0;
 begin
-    txd_out <= tx_reg;
-    tx_busy <= '1' when state /= IDLE else '0';
 
     process(clk, reset_n)
     begin
         if reset_n = '0' then
-            state <= IDLE;
-            bit_cnt <= 0;
-            shift_reg <= (others=>'0');
-            tx_reg <= '1';
+            state     <= IDLE;
+            txd_out   <= '1';
+            tx_busy   <= '0';
+            data_reg  <= (others=>'0');
+            bit_cnt   <= 0;
+            tick_cnt  <= 0;
+            
         elsif rising_edge(clk) then
-            if baud_tick = '1' then
-                case state is
-                    when IDLE =>
-                        if tx_start = '1' then
-                            shift_reg <= tx_data;
-                            state <= START_BIT;
-                            tx_reg <= '0'; -- старт-біт
+            
+            case state is
+                when IDLE =>
+                    txd_out  <= '1';
+                    tx_busy  <= '0';
+                    bit_cnt  <= 0;
+                    tick_cnt <= 0;
+                    
+                    if tx_start = '1' then
+                        data_reg <= tx_data;
+                        state    <= START_BIT;
+                        tx_busy  <= '1';
+                    end if;
+                
+                when START_BIT =>
+                    txd_out <= '0';
+                    
+                    if baud_tick = '1' then
+                        if tick_cnt = 15 then
+                            tick_cnt <= 0;
+                            state    <= DATA_BITS;
                         else
-                            tx_reg <= '1';
+                            tick_cnt <= tick_cnt + 1;
                         end if;
-
-                    when START_BIT =>
-                        state <= DATA_BITS;
-                        bit_cnt <= 0;
-                        tx_reg <= shift_reg(0);
-
-                    when DATA_BITS =>
-                        if bit_cnt = 7 then
-                            state <= STOP_BIT;
+                    end if;
+                
+                when DATA_BITS =>
+                    txd_out <= data_reg(bit_cnt);
+                    
+                    if baud_tick = '1' then
+                        if tick_cnt = 15 then
+                            tick_cnt <= 0;
+                            
+                            if bit_cnt = 7 then
+                                state   <= STOP_BIT;
+                                bit_cnt <= 0;
+                            else
+                                bit_cnt <= bit_cnt + 1;
+                            end if;
                         else
-                            bit_cnt <= bit_cnt + 1;
+                            tick_cnt <= tick_cnt + 1;
                         end if;
-                        shift_reg <= shift_reg(7 downto 1) & '0';
-                        tx_reg <= shift_reg(0);
-
-                    when STOP_BIT =>
-                        tx_reg <= '1';
-                        state <= IDLE;
-
-                    when others =>
-                        state <= IDLE;
-                end case;
-            end if;
+                    end if;
+                
+                when STOP_BIT =>
+                    txd_out <= '1';
+                    
+                    if baud_tick = '1' then
+                        if tick_cnt = 15 then
+                            tick_cnt <= 0;
+                            state    <= IDLE;
+                            tx_busy  <= '0';
+                        else
+                            tick_cnt <= tick_cnt + 1;
+                        end if;
+                    end if;
+                
+                when others =>
+                    state <= IDLE;
+            end case;
+            
         end if;
     end process;
+
 end Behavioral;
