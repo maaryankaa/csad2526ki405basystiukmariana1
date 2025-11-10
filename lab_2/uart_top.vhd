@@ -24,7 +24,10 @@ architecture Structural of uart_top is
 begin
     -- Генератор баудової частоти
     baud_gen_inst : entity work.uart_baud_gen
-        generic map (CLOCK_FREQ => 50000000, BAUD_RATE => 9600)
+    generic map (
+        CLOCK_FREQ => 50000000,
+        BAUD_RATE  => 9600  
+    )
         port map(clk => clk, reset_n => reset_n, baud_tick => baud_tick);
 
     -- UART передавач
